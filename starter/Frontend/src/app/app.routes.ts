@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { DummiesList } from './dummies-list/dummies-list';
-import { GenerateRecords } from './generate-records/generate-records';
+import { Dashboard } from './dashboard/dashboard';
+import { Editor } from './editor/editor';
 
 export const routes: Routes = [
-    { path: 'dummies', component: DummiesList },
-    { path: 'generate', component: GenerateRecords },
-    { path: '', redirectTo: '/dummies', pathMatch: 'full' }
+  { path: 'dashboard', component: Dashboard },
+  { path: 'editor', component: Editor },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
 ];

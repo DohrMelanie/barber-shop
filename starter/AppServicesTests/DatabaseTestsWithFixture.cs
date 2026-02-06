@@ -20,7 +20,7 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
                 Date = new DateOnly(2023, 10, 1),
                 StartTime = new TimeOnly(14, 0),
                 Duration = TimeSpan.FromMinutes(30),
-                BarberName = "Sweeney Todd"
+                BarberName = "Gerrit"
             };
             context.Appointments.Add(appt);
             await context.SaveChangesAsync();
@@ -33,7 +33,7 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
             var match = await context.Appointments.FindAsync(appointmentId);
             Assert.NotNull(match);
             Assert.Equal("Test Customer", match.CustomerName);
-            Assert.Equal("Sweeney Todd", match.BarberName);
+            Assert.Equal("Gerrit", match.BarberName);
             Assert.Equal(new DateOnly(2023, 10, 1), match.Date);
         }
     }
@@ -71,6 +71,82 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
             Assert.NotNull(match);
             Assert.Equal(2, match.Services.Count);
             Assert.Contains(match.Services, s => s.Name == "Haircut");
+        }
+    }
+    [Fact]
+    public async Task CanUpdateAppointment()
+    {
+        // Arrange
+        int appointmentId;
+        await using (var context = new ApplicationDataContext(fixture.Options))
+        {
+            var appt = new Appointment
+            {
+                CustomerName = "Original Name",
+                Date = new DateOnly(2024, 2, 1),
+                StartTime = new TimeOnly(12, 0),
+                Duration = TimeSpan.FromMinutes(45)
+            };
+            context.Appointments.Add(appt);
+            await context.SaveChangesAsync();
+            appointmentId = appt.Id;
+        }
+
+        // Act
+        await using (var context = new ApplicationDataContext(fixture.Options))
+        {
+            var appt = await context.Appointments.FindAsync(appointmentId);
+            Assert.NotNull(appt);
+            appt.CustomerName = "Updated Name";
+            appt.Duration = TimeSpan.FromMinutes(60);
+            await context.SaveChangesAsync();
+        }
+
+        // Assert
+        await using (var context = new ApplicationDataContext(fixture.Options))
+        {
+            var appt = await context.Appointments.FindAsync(appointmentId);
+            Assert.NotNull(appt);
+            Assert.Equal("Updated Name", appt.CustomerName);
+            Assert.Equal(TimeSpan.FromMinutes(60), appt.Duration);
+        }
+    }
+
+    [Fact]
+    public async Task CanDeleteAppointment()
+    {
+        // Arrange
+        int appointmentId;
+        await using (var context = new ApplicationDataContext(fixture.Options))
+        {
+            var appt = new Appointment
+            {
+                CustomerName = "To Be Deleted",
+                Date = new DateOnly(2024, 3, 1),
+                StartTime = new TimeOnly(9, 0),
+                Duration = TimeSpan.FromMinutes(15)
+            };
+            context.Appointments.Add(appt);
+            await context.SaveChangesAsync();
+            appointmentId = appt.Id;
+        }
+
+        // Act
+        await using (var context = new ApplicationDataContext(fixture.Options))
+        {
+            var appt = await context.Appointments.FindAsync(appointmentId);
+            if (appt != null)
+            {
+                context.Appointments.Remove(appt);
+            }
+            await context.SaveChangesAsync();
+        }
+
+        // Assert
+        await using (var context = new ApplicationDataContext(fixture.Options))
+        {
+            var appt = await context.Appointments.FindAsync(appointmentId);
+            Assert.Null(appt);
         }
     }
 }
