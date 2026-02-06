@@ -1,177 +1,172 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12">
-  <div class="container mx-auto px-4 max-w-2xl">
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <!-- Header -->
-      <div class="bg-slate-50 px-8 py-6 border-b border-slate-200">
-        <h2 class="text-2xl font-bold text-slate-800">New Appointment</h2>
-        <p class="text-sm text-slate-500 mt-1">Fill in the details below</p>
+<div class="container">
+  <div class="card">
+    <!-- Header -->
+    <div class="card-header">
+      <h2 class="card-title">Appointment Booking Form</h2>
+      <p class="card-description">Complete your financial commitment below</p>
+    </div>
+
+    <!-- Form -->
+    <!-- TODO: Implement form binding and submission -->
+    <form class="card-body">
+      <!-- Customer Name -->
+      <div class="form-group">
+        <label class="form-label"> Customer Name (for invoicing purposes) </label>
+        <input type="text" class="form-input" placeholder="e.g., Warren Buffett" />
+        <p class="form-hint">Full legal name required for collections department</p>
       </div>
 
-      <!-- Form -->
-      <!-- TODO: Implement form binding and submission -->
-      <form class="p-8 space-y-6">
-        <!-- Customer Name -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2"> Customer Name </label>
-          <input
-            type="text"
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            placeholder="Enter customer name"
-          />
+      <!-- Date and Time -->
+      <div class="form-grid form-grid-2">
+        <div class="form-group">
+          <label class="form-label">Appointment Date</label>
+          <input type="date" class="form-input" />
+          <p class="form-hint">⚠️ Fridays-Sundays only (we're lazy)</p>
         </div>
-
-        <!-- Date and Time -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2"> Date </label>
-            <input
-              type="date"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            />
-            <p class="text-xs text-slate-500 mt-1">Only Friday-Sunday available</p>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-700 mb-2"> Start Time </label>
-            <input
-              type="time"
-              class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            />
-            <p class="text-xs text-slate-500 mt-1">Happy hour: 14:00-16:00</p>
-          </div>
+        <div class="form-group">
+          <label class="form-label">Start Time</label>
+          <input type="time" class="form-input" />
+          <p class="form-hint">💰 Happy Hour: 14:00-16:00 (slightly less expensive)</p>
         </div>
+      </div>
 
-        <!-- Duration -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2"> Duration (minutes) </label>
-          <input
-            type="number"
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-            placeholder="60"
-            min="15"
-            step="15"
-          />
-        </div>
+      <!-- Duration -->
+      <div class="form-group">
+        <label class="form-label">Duration (minutes)</label>
+        <input type="number" class="form-input" placeholder="60" min="15" step="15" />
+        <p class="form-hint">Longer = More Money for Us!</p>
+      </div>
 
-        <!-- Barber Selection -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-3"> Select Barber </label>
-          <div class="grid grid-cols-2 gap-4">
-            <label class="relative cursor-pointer">
-              <input type="radio" name="barber" value="Gerrit" class="peer sr-only" />
-              <div
-                class="p-4 border-2 border-slate-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all hover:border-slate-300"
-              >
-                <div class="font-semibold text-slate-800">Gerrit</div>
-                <div class="text-xs text-slate-500 mt-1">Master Barber</div>
-              </div>
-            </label>
-            <label class="relative cursor-pointer">
-              <input type="radio" name="barber" value="Todd" class="peer sr-only" />
-              <div
-                class="p-4 border-2 border-slate-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 transition-all hover:border-slate-300"
-              >
-                <div class="font-semibold text-slate-800">Todd</div>
-                <div class="text-xs text-slate-500 mt-1">Apprentice</div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        <!-- Services -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-3"> Services </label>
-          <!-- TODO: Populate service options dynamically -->
-          <div class="space-y-2">
-            <label
-              class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-            >
-              <input
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-              />
-              <span class="ml-3 text-sm text-slate-700">Faded Cut</span>
-              <span class="ml-auto text-sm font-medium text-slate-900">€40.00</span>
-            </label>
-            <label
-              class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-            >
-              <input
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-              />
-              <span class="ml-3 text-sm text-slate-700">Beard Shaped</span>
-              <span class="ml-auto text-sm font-medium text-slate-900">€15.00</span>
-            </label>
-            <label
-              class="flex items-center p-3 border border-slate-200 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-            >
-              <input
-                type="checkbox"
-                class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-              />
-              <span class="ml-3 text-sm text-slate-700">Hot Towel Shave</span>
-              <span class="ml-auto text-sm font-medium text-slate-900">€18.00</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Beverage Choice -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            Beverage Preference (Optional)
+      <!-- Barber Selection -->
+      <div class="form-group">
+        <label class="form-label">Select Your Barber</label>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="barber" value="Gerrit" />
+            <div class="radio-content">
+              <div class="radio-title">Gerrit</div>
+              <div class="radio-description">Master Artisan</div>
+              <div class="text-xs text-danger mt-2">⚠️ +20% "Genius Tax"</div>
+            </div>
           </label>
-          <select
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-          >
-            <option value="">None</option>
-            <option value="Coffee">Coffee</option>
-            <option value="Tea">Tea</option>
-            <option value="Water">Water</option>
-            <option value="Champagne">Champagne</option>
-          </select>
-          <p class="text-xs text-slate-500 mt-1">Surcharge applies if selected</p>
-        </div>
-
-        <!-- VIP Status -->
-        <div>
-          <label class="flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
-            />
-            <span class="ml-3 text-sm font-medium text-slate-700"
-              >VIP Treatment (1.5x price multiplier)</span
-            >
+          <label class="radio-card">
+            <input type="radio" name="barber" value="Todd" />
+            <div class="radio-content">
+              <div class="radio-title">Todd</div>
+              <div class="radio-description">Learning in Public</div>
+              <div class="text-xs text-success mt-2">✅ €5 discount (luck required)</div>
+            </div>
           </label>
         </div>
+      </div>
 
-        <!-- Price Estimate -->
-        <!-- TODO: Calculate and display estimated price in real-time -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div class="flex justify-between items-center">
-            <span class="text-sm font-medium text-slate-700">Estimated Total:</span>
-            <span class="text-2xl font-bold text-blue-600">€--</span>
+      <!-- Services -->
+      <div class="form-group">
+        <label class="form-label">Select Services (Mandatory Enhancements)</label>
+        <!-- TODO: Populate service options dynamically -->
+        <div>
+          <div class="checkbox-item">
+            <label class="checkbox-label">
+              <input type="checkbox" />
+              <span class="checkbox-name">Faded Cut</span>
+            </label>
+            <span class="checkbox-price">€40.00</span>
           </div>
-          <p class="text-xs text-slate-500 mt-1">Final price calculated on server</p>
+          <div class="checkbox-item">
+            <label class="checkbox-label">
+              <input type="checkbox" />
+              <span class="checkbox-name">Undercut</span>
+            </label>
+            <span class="checkbox-price">€42.00</span>
+          </div>
+          <div class="checkbox-item">
+            <label class="checkbox-label">
+              <input type="checkbox" />
+              <span class="checkbox-name">Beard Shaped</span>
+            </label>
+            <span class="checkbox-price">€15.00</span>
+          </div>
+          <div class="checkbox-item">
+            <label class="checkbox-label">
+              <input type="checkbox" />
+              <span class="checkbox-name">Hot Towel Shave</span>
+            </label>
+            <span class="checkbox-price">€18.00</span>
+          </div>
+          <div class="checkbox-item" style="opacity: 0.6">
+            <label class="checkbox-label">
+              <input type="checkbox" checked disabled />
+              <span class="checkbox-name">Processing Fee (Non-Optional)</span>
+            </label>
+            <span class="checkbox-price">€8.00</span>
+          </div>
         </div>
+      </div>
 
-        <!-- Actions -->
-        <div class="flex gap-4 pt-4">
-          <a
-            href="/"
-            class="flex-1 px-6 py-3 border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors text-center"
-          >
-            Cancel
-          </a>
-          <!-- TODO: Implement form validation and submission -->
-          <button
-            type="submit"
-            class="flex-1 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Appointment
-          </button>
+      <!-- Beverage Choice -->
+      <div class="form-group">
+        <label class="form-label">Beverage Preference</label>
+        <select class="form-select">
+          <option value="">None (remain thirsty)</option>
+          <option value="Coffee">Coffee (€8 surcharge)</option>
+          <option value="Tea">Tea (€8 surcharge)</option>
+          <option value="Water">Tap Water (€8 surcharge)</option>
+          <option value="Champagne">Champagne (still €8 surcharge 🤫)</option>
+        </select>
+        <p class="form-hint">All beverages priced identically for "fairness"</p>
+      </div>
+
+      <!-- VIP Status -->
+      <div class="form-group">
+        <label class="checkbox-label" style="cursor: pointer">
+          <input type="checkbox" />
+          <span class="checkbox-name">
+            <strong>VIP Treatment</strong> - Receive personalized attention and 1.5x price
+            multiplier
+          </span>
+        </label>
+        <p class="form-hint">Because you deserve to pay more!</p>
+      </div>
+
+      <!-- Price Estimate -->
+      <!-- TODO: Calculate and display estimated price in real-time -->
+      <div class="price-estimate" style="position: relative">
+        <div class="scam-warning" style="top: -0.75rem; right: -0.75rem">*minimum spend</div>
+        <div class="flex items-center justify-between">
+          <span class="price-estimate-label">Estimated Financial Damage:</span>
+          <span class="price-estimate-value">€--</span>
         </div>
-      </form>
-    </div>
+        <p class="price-estimate-note">
+          Final price calculated server-side using our proprietary "Value Extraction Algorithm™"
+        </p>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-4 mt-6">
+        <a href="/" class="btn btn-secondary" style="flex: 1; text-align: center">
+          🏃 Flee While You Can
+        </a>
+        <!-- TODO: Implement form validation and submission -->
+        <button type="submit" class="btn btn-primary" style="flex: 2">
+          💸 Commit to Financial Ruin
+        </button>
+      </div>
+
+      <!-- Fine Print -->
+      <div
+        class="scam-disclaimer"
+        style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1rem"
+      >
+        By submitting this form, you acknowledge that:
+        <ul style="text-align: left; margin-top: 0.5rem; padding-left: 1.5rem; list-style: disc">
+          <li>The displayed price is merely a "suggestion"</li>
+          <li>
+            Actual charges may include breathing tax, floor usage fee, and emotional labor surcharge
+          </li>
+          <li>Gerrit reserves the right to adjust prices based on your LinkedIn salary range</li>
+          <li>All sales are final. No refunds. No survivors.</li>
+        </ul>
+      </div>
+    </form>
   </div>
 </div>

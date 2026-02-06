@@ -1,113 +1,111 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-  <div class="container mx-auto px-4 py-8 max-w-7xl">
-    <!-- Header -->
-    <header class="mb-12">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-        <div>
-          <h1 class="text-4xl md:text-5xl font-bold text-slate-800 tracking-tight">
-            Gerrit's Cuts
-          </h1>
-          <p class="text-slate-500 text-sm mt-2">Premium Barber Services</p>
-        </div>
+<div class="container">
+  <!-- Header -->
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Gerrit's Cuts</h1>
+      <p class="page-subtitle">Where Your Wallet Gets a Haircut Too™</p>
+    </div>
 
-        <!-- TODO: Implement navigation to editor -->
-        <a
-          href="/editor"
-          class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-        >
-          New Appointment
-        </a>
-      </div>
-    </header>
+    <!-- TODO: Implement navigation to editor -->
+    <a href="/editor" class="btn btn-primary">
+      <span>📅</span>
+      <span>Book Your Financial Sacrifice</span>
+    </a>
+  </header>
 
-    <!-- Appointments List -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <!-- Loading State -->
-      <!-- TODO: Show when loading data -->
-      <div class="hidden p-12 text-center">
-        <div
-          class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
-        ></div>
-        <p class="text-slate-500 mt-4">Loading appointments...</p>
-      </div>
+  <!-- Main Card -->
+  <div class="card" style="position: relative">
+    <!-- Scammy Warning Banner -->
+    <div class="scam-warning">*Viewing fees may apply</div>
 
-      <!-- Table -->
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-slate-50 border-b border-slate-200">
-            <tr>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"
-              >
-                Date & Time
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"
-              >
-                Customer
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"
-              >
-                Barber
-              </th>
-              <th
-                class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider"
-              >
-                Services
-              </th>
-              <th
-                class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider"
-              >
-                Price
-              </th>
-              <th
-                class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider"
-              >
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <!-- TODO: Loop through appointments -->
-            <!-- Example Row (Static) -->
-            <tr class="hover:bg-slate-50 transition-colors">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-slate-900">Mar 15, 2024</div>
-                <div class="text-sm text-slate-500">14:30</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm font-medium text-slate-900">John Doe</div>
-              </td>
-              <td class="px-6 py-4">
-                <span
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
-                >
-                  Gerrit
-                </span>
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm text-slate-900">Faded, BeardShaped</div>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <div class="text-sm font-semibold text-slate-900">€67.20</div>
-              </td>
-              <td class="px-6 py-4 text-right">
-                <!-- TODO: Implement delete functionality -->
-                <button class="text-sm text-red-600 hover:text-red-800 font-medium">Delete</button>
-              </td>
-            </tr>
+    <!-- Loading State -->
+    <!-- TODO: Show when loading data -->
+    <div class="loading-container hidden">
+      <div class="spinner"></div>
+      <p class="text-secondary mt-4">Calculating obscure charges...</p>
+    </div>
 
-            <!-- Empty State -->
-            <!-- TODO: Show when no appointments exist -->
-            <tr class="hidden">
-              <td colspan="6" class="px-6 py-12 text-center text-slate-500">
-                No appointments scheduled
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+    <!-- Appointments Table -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Valued Customer</th>
+            <th>Artist</th>
+            <th>Premium Services</th>
+            <th class="text-right">Investment Required</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- TODO: Loop through appointments -->
+          <!-- Example Row (Static) -->
+          <tr>
+            <td>
+              <div class="font-semibold">Mar 15, 2024</div>
+              <div class="text-secondary text-sm">14:30</div>
+            </td>
+            <td>
+              <div class="font-semibold">John "Deep Pockets" Doe</div>
+            </td>
+            <td>
+              <span class="badge badge-primary">Gerrit</span>
+            </td>
+            <td>
+              <div class="text-sm">Faded, Beard Shaped</div>
+            </td>
+            <td class="text-right">
+              <div class="font-bold text-success">€67.20++</div>
+              <div class="text-xs text-tertiary">*plus fees</div>
+            </td>
+            <td class="text-right">
+              <!-- TODO: Implement delete functionality -->
+              <button class="btn btn-danger">Cancel (No Refunds)</button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div class="font-semibold">Mar 17, 2024</div>
+              <div class="text-secondary text-sm">10:00</div>
+            </td>
+            <td>
+              <div class="font-semibold">Jane "VIP" Smith</div>
+            </td>
+            <td>
+              <span class="badge badge-primary">Gerrit</span>
+            </td>
+            <td>
+              <div class="text-sm">Undercut, Hot Towel Shave</div>
+            </td>
+            <td class="text-right">
+              <div class="font-bold text-success">€102.00++</div>
+              <div class="text-xs text-tertiary">*VIP multiplier applied</div>
+            </td>
+            <td class="text-right">
+              <button class="btn btn-danger">Forfeit Deposit</button>
+            </td>
+          </tr>
+
+          <!-- Empty State -->
+          <!-- TODO: Show when no appointments exist -->
+          <tr class="hidden">
+            <td colspan="6" class="empty-state">
+              No victims scheduled yet. The money printer is offline.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Scammy Disclaimer Footer -->
+    <div class="scam-disclaimer">
+      ** Prices are subject to change based on barber's mood, lunar phase, and customer's perceived
+      net worth. All transactions are final. By viewing this page, you agree to a €5 "administrative
+      fee" (automatically charged to your conscience).
+      <br />
+      Projected Annual Revenue from All Customers: <strong>€∞</strong>
     </div>
   </div>
 </div>
