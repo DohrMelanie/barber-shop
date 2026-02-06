@@ -6,14 +6,15 @@ namespace AppServices;
 
 public partial class ApplicationDataContext(DbContextOptions<ApplicationDataContext> options) : DbContext(options)
 {
-    public DbSet<Dummy> Dummies => Set<Dummy>();
+    public DbSet<Appointment> Appointments => Set<Appointment>();
+    public DbSet<AppointmentService> AppointmentServices => Set<AppointmentService>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Dummy>()
-            .Property(e => e.DecimalProperty)
-            .HasConversion<double>() // or use string for exact precision
-            .HasColumnType("REAL");
+        modelBuilder.Entity<AppointmentService>()
+            .HasOne<Appointment>()
+            .WithMany(a => a.Services)
+            .HasForeignKey(s => s.AppointmentId);
     }
 }
 
