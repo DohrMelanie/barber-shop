@@ -2,162 +2,349 @@
 
 ## Overview
 
-The barber shop uses a complex pricing model that calculates the **total price per appointment** based on multiple factors. The price is calculated server-side when retrieving appointment details.
+The barber shop uses a highly complex pricing model that calculates the **total price per appointment** based on multiple factors including service combinations, time-based pricing, customer loyalty history, and group bookings. The price is calculated server-side and requires querying the database for historical data.
 
 ## Base Pricing by Service Type
 
 Each `StyleReference` enum value has a different base price:
 
-| Style Reference | Base Price |
-| --------------- | ---------- |
-| Short           | €25.00     |
-| Medium          | €30.00     |
-| Long            | €35.00     |
-| Faded           | €40.00     |
-| Tapered         | €38.00     |
-| Undercut        | €42.00     |
-| Layered         | €45.00     |
-| Textured        | €48.00     |
-| SlickedBack     | €35.00     |
-| SideParted      | €32.00     |
-| ForwardCrop     | €38.00     |
-| Voluminous      | €50.00     |
-| Natural         | €28.00     |
-| MulletStyle     | €60.00     |
-| MohawkStyle     | €65.00     |
-| BeardShaped     | €15.00     |
-| CleanShaven     | €12.00     |
-| HotTowelShave   | €18.00     |
+| Style Reference | Base Price | Min. Duration (min) |
+| --------------- | ---------- | ------------------- |
+| Short           | €25.00     | 20                  |
+| Medium          | €30.00     | 25                  |
+| Long            | €35.00     | 30                  |
+| Faded           | €40.00     | 30                  |
+| Tapered         | €38.00     | 30                  |
+| Undercut        | €42.00     | 35                  |
+| Layered         | €45.00     | 40                  |
+| Textured        | €48.00     | 40                  |
+| SlickedBack     | €35.00     | 25                  |
+| SideParted      | €32.00     | 25                  |
+| ForwardCrop     | €38.00     | 30                  |
+| Voluminous      | €50.00     | 45                  |
+| Natural         | €28.00     | 20                  |
+| MulletStyle     | €60.00     | 50                  |
+| MohawkStyle     | €65.00     | 50                  |
+| BeardShaped     | €15.00     | 10                  |
+| CleanShaven     | €12.00     | 10                  |
+| HotTowelShave   | €18.00     | 15                  |
 
-## Pricing Rules
+## Validation Rules (Must Check BEFORE Price Calculation)
 
-### 1. Base Calculation
-
-- Start with the sum of all service base prices for the appointment
-- Price is calculated as: `Σ(Service.StyleReference.BasePrice)`
-
-### 2. Payday Surcharge (15th of the Month)
-
-- If the appointment date is on the **15th day of any month**, add a **25% surcharge**
-- Rationale: Customers just got paid and can afford premium pricing
-
-### 3. Sunday Premium
-
-- If the appointment is scheduled on **Sunday**, add a **€20.00 flat surcharge**
-- Rationale: Weekend work demands premium compensation
-
-### 4. Weekday Restriction (API Validation)
+### 1. Weekday Restriction
 
 - Appointments **MUST NOT** be scheduled Monday through Thursday
 - Valid days: **Friday, Saturday, Sunday only**
-- API should return `400 Bad Request` if appointment date falls on Monday-Thursday
-- Error message: "Gerrit's Cuts is closed Monday-Thursday. We value our leisure time."
+- API should return `400 Bad Request` with message: "Gerrit's Cuts is closed Monday-Thursday. We value our leisure time."
 
-### 5. Happy Hour Discount
+### 2. Service Conflicts
 
-- If appointment `StartTime` is between **14:00 and 16:00** (2 PM - 4 PM), apply a **15% discount**
-- Rationale: Attract customers during slow afternoon hours
-- Discount is applied to the running total (after base + surcharges)
+Certain service combinations are **invalid** and must be rejected:
 
-### 6. Beverage Surcharge
+- **Conflicting beard services**: `CleanShaven` + `BeardShaped` (cannot be both)
+- **Multiple length categories**: Cannot have more than one of: `Short`, `Medium`, `Long`
+- If conflicts detected, return `400 Bad Request` with message: "Service combination conflict detected: [service1] and [service2] cannot be booked together."
 
-- If `BeverageChoice` is **not null or empty**, add a **€8.00 surcharge**
-- Rationale: Complimentary beverage service (coffee, water, champagne for VIPs)
+### 3. Duration Validation
 
-### 7. VIP Multiplier
+- Total appointment `Duration` must be **greater than or equal to** the sum of all service minimum durations
+- Formula: `Duration >= Σ(Service.MinDuration)`
+- If invalid, return `400 Bad Request` with message: "Appointment duration (X min) is insufficient for selected services (requires minimum Y min)."
 
-- If `IsVip` is `true`, multiply the entire total by **1.5x**
-- Rationale: VIP customers receive extra attention and premium service
-- Applied as the final calculation step
+### 4. Barber Availability
 
-### 8. Barber-Specific Markup
+- **Gerrit** only works during peak hours: Friday 16:00-20:00, Saturday-Sunday 10:00-18:00
+- If appointment with Gerrit falls outside these hours, return `400 Bad Request` with message: "Gerrit only works during peak hours (Fri 16:00-20:00, Sat-Sun 10:00-18:00)."
+- **Todd** can work any valid business hours
 
-- If `BarberName` equals **"Gerrit"**, add a **20% "Master Artisan" surcharge**
-- If `BarberName` equals **"Todd"**, subtract **€5.00** (apprentice discount)
-- If `BarberName` is any other value, no adjustment
+### 5. Barber Time Conflict Detection
 
-### 9. Duration Fee
+- Query database for existing appointments for the same barber
+- Check if new appointment time overlaps with existing appointments (same date, overlapping start/end times)
+- If conflict exists, return `409 Conflict` with message: "Time slot unavailable. [BarberName] already has an appointment at this time."
 
-- For every 15 minutes of `Duration` beyond the first 30 minutes, add **€2.50**
-- Example: 60-minute appointment = (60-30)/15 = 2 increments = €5.00 additional
+## Pricing Rules (Applied in Order)
 
-## Calculation Order
+### Step 1: Calculate Base Price
 
-Apply rules in the following sequence:
+Start with the sum of all service base prices:
 
-1. Calculate base price (sum of all service base prices)
-2. Add payday surcharge (+25% if applicable)
-3. Add Sunday premium (+€20.00 if applicable)
-4. Add barber markup (Gerrit +20%, Todd -€5.00)
-5. Add duration fee (€2.50 per 15 min over 30 min)
-6. Apply happy hour discount (-15% if applicable)
-7. Add beverage surcharge (+€8.00 if applicable)
-8. Apply VIP multiplier (×1.5 if applicable)
+```
+basePrice = Σ(Service.StyleReference.BasePrice)
+```
+
+### Step 2: Service Count Premium
+
+Charge extra if customer books multiple services:
+
+- **1 service**: No premium
+- **2 services**: +5% (customer is needy)
+- **3+ services**: +10% (very needy customer)
+
+```
+if (serviceCount == 2) basePrice *= 1.05
+else if (serviceCount >= 3) basePrice *= 1.10
+```
+
+### Step 3: Service Combination Discounts
+
+Apply automatic discounts for specific combinations:
+
+**Combo A - Hair + Beard**: If appointment includes at least one haircut service AND at least one beard service:
+
+- Determine which are haircut services: Any of `Short`, `Medium`, `Long`, `Faded`, `Tapered`, `Undercut`, `Layered`, `Textured`, `SlickedBack`, `SideParted`, `ForwardCrop`, `Voluminous`, `Natural`, `MulletStyle`, `MohawkStyle`
+- Determine which are beard services: Any of `BeardShaped`, `CleanShaven`, `HotTowelShave`
+- If BOTH categories present: Apply 10% discount to the cheapest beard service
+
+**Combo B - Package Deal**: If appointment has 3 or more services total:
+
+- Apply 15% discount to the entire current total (stacks with Combo A if applicable)
+
+**Important**: Combo discounts apply to the price AFTER service count premium
+
+### Step 4: Payday Surcharge
+
+- If appointment date is the **15th of any month**: +25% surcharge
+- Rationale: Customers just got paid
+
+### Step 5: Sunday Premium
+
+- If appointment is on **Sunday**: +€20.00 flat fee
+- Rationale: Weekend work premium
+
+### Step 6: Time-Based Pricing Modifiers
+
+Apply ONE of the following based on day and time:
+
+**Peak Hours** (+30% surcharge):
+
+- Friday: 16:00-20:00
+- Saturday: 10:00-18:00
+- Sunday: 10:00-18:00
+
+**Happy Hours** (-15% discount):
+
+- Friday: 14:00-16:00 (just before peak)
+
+**Off-Peak/Dead Hours** (-20% discount):
+
+- Friday: 08:00-10:00 (early morning)
+
+**Important**: These modifiers are mutually exclusive. Check in order: Peak → Happy → Off-Peak
+
+### Step 7: Barber-Specific Markup
+
+- If `BarberName == "Gerrit"`: +20% ("Master Artisan Fee")
+- If `BarberName == "Todd"`: -€5.00 (apprentice discount)
+- Else: No adjustment
+
+### Step 8: Duration Fee
+
+For every 15 minutes beyond the **required minimum duration** (not the standard 30 min baseline):
+
+- Calculate required minimum: `requiredMin = Σ(Service.MinDuration)`
+- If `Duration > requiredMin`: charge €2.50 per 15-minute increment
+
+```
+extraMinutes = Duration - requiredMin
+if (extraMinutes > 0) {
+    increments = ceil(extraMinutes / 15)
+    durationFee = increments * 2.50
+}
+```
+
+### Step 9: Beverage Surcharge
+
+- If `BeverageChoice` is not null/empty: +€8.00
+- Rationale: Premium beverage service
+
+### Step 10: Customer Loyalty Tier Discount
+
+**Requires Database Query**: Count the number of **previous** appointments for this `CustomerName` (exclude current appointment):
+
+| Tier     | Previous Appointments | Discount |
+| -------- | --------------------- | -------- |
+| Bronze   | 0-2                   | 0%       |
+| Silver   | 3-5                   | 5%       |
+| Gold     | 6-10                  | 10%      |
+| Platinum | 11+                   | 15%      |
+
+Apply the discount to the running total.
+
+**Implementation Note**: Students must query the database:
+
+```sql
+SELECT COUNT(*) FROM Appointments
+WHERE CustomerName = @customerName
+AND Date < @currentAppointmentDate
+```
+
+### Step 11: Group Booking Discount
+
+**Requires Database Query**: Check if there are other appointments with the same `CustomerName` on the same `Date` where the time ranges overlap (within ±30 minutes):
+
+- Count appointments where:
+  - Same `CustomerName`
+  - Same `Date`
+  - Time ranges overlap: `|StartTime1 - StartTime2| <= 30 minutes`
+
+| Group Size | Discount |
+| ---------- | -------- |
+| 1 person   | 0%       |
+| 2-3 people | 10%      |
+| 4+ people  | 20%      |
+
+**Implementation Note**: Students must detect overlapping time ranges and count group members.
+
+### Step 12: VIP Multiplier (Final Step)
+
+- If `IsVip == true`: Multiply entire total by **1.5x**
+- Rationale: VIP customers receive premium service and pay premium prices
+- This is the **final** calculation step
+
+## Calculation Order Summary
+
+1. ✅ Base price (sum of services)
+2. ✅ Service count premium (+5% or +10%)
+3. ✅ Combo discounts (-10% on beard service, -15% package deal)
+4. ✅ Payday surcharge (+25% if 15th)
+5. ✅ Sunday premium (+€20)
+6. ✅ Time-based modifier (+30%, -15%, or -20%)
+7. ✅ Barber markup (Gerrit +20%, Todd -€5)
+8. ✅ Duration fee (€2.50 per 15 min over required minimum)
+9. ✅ Beverage surcharge (+€8)
+10. ✅ Loyalty tier discount (0-15% based on history)
+11. ✅ Group booking discount (0-20% based on overlaps)
+12. ✅ VIP multiplier (×1.5)
 
 ## Implementation Requirements
 
-### Backend
+### Backend Tasks
 
-- Add a `CalculatedPrice` property to the `Appointment` entity (computed, not stored)
-- Implement price calculation logic in a service or extension method
-- When retrieving appointments via API, include the calculated price in the response
-- Validate appointment dates to ensure Monday-Thursday bookings are rejected
+1. **Create a `PriceCalculationService`** with method `CalculatePrice(Appointment appt)`
+2. **Implement all validation rules** with appropriate HTTP status codes
+3. **Query database** for:
+   - Existing appointments (barber conflict detection)
+   - Customer appointment history (loyalty tier)
+   - Group bookings (time overlap detection)
+4. **Add `decimal CalculatedPrice { get; }` property** to `Appointment` entity (computed, not stored)
+5. **Include calculated price in API responses**
 
-### Frontend
+### Frontend Tasks
 
-- Display the calculated price in the dashboard
-- Show price estimate in real-time as the user builds an appointment in the editor
-- Clearly indicate any surcharges/discounts applied
+- Display calculated price in dashboard
+- Show real-time price estimate in editor as user selects options
+- Display helpful error messages for validation failures
 
-## Examples
+## Example Calculations
 
-### Example 1: Standard Friday Haircut
+### Example 1: Simple Weekday Booking (Invalid)
 
-- Service: Faded (€40.00)
-- Date: Friday, March 8
-- Time: 10:00
+**Input:**
+
+- Date: Monday, March 10
+- Services: Faded Cut
+
+**Result:** `400 Bad Request` - "Gerrit's Cuts is closed Monday-Thursday."
+
+---
+
+### Example 2: Service Conflict (Invalid)
+
+**Input:**
+
+- Date: Friday, March 14
+- Services: CleanShaven + BeardShaped
+
+**Result:** `400 Bad Request` - "Service combination conflict: CleanShaven and BeardShaped cannot be booked together."
+
+---
+
+### Example 3: Standard Friday Appointment
+
+**Input:**
+
+- Services: Faded (€40)
+- Date: Friday, March 7, 10:00
+- Duration: 45 min
 - Barber: Todd
-- Duration: 30 minutes
-- VIP: No
+- Previous appointments: 4 (Silver tier)
 - Beverage: None
+- VIP: No
 
 **Calculation:**
 
 1. Base: €40.00
-2. Barber (Todd): €40.00 - €5.00 = €35.00
-3. **Total: €35.00**
+2. Service count: 1 service → no premium
+3. Combo: No combo
+4. Payday: Not 15th → no surcharge
+5. Sunday: Not Sunday → no premium
+6. Time modifier: 10:00 Friday → no modifier
+7. Barber (Todd): €40 - €5 = €35.00
+8. Duration: Required min = 30, actual = 45, extra = 15 → €2.50
+   - Total: €35 + €2.50 = €37.50
+9. Beverage: None
+10. Loyalty (Silver, 4 prev): €37.50 × 0.95 = €35.63
+11. Group: No overlaps → no discount
+12. VIP: No
 
-### Example 2: VIP Weekend Special
+**Final Price: €35.63**
 
-- Services: Undercut (€42.00) + BeardShaped (€15.00)
-- Date: Sunday, June 15
-- Time: 15:00 (Happy Hour!)
+---
+
+### Example 4: Complex VIP Weekend Package
+
+**Input:**
+
+- Services: Undercut (€42), BeardShaped (€15), HotTowelShave (€18)
+- Date: Sunday, June 15, 15:00
+- Duration: 90 min
 - Barber: Gerrit
-- Duration: 60 minutes
-- VIP: Yes
+- Previous appointments: 12 (Platinum tier)
 - Beverage: "Champagne"
+- VIP: Yes
+- Group: 3 people (overlapping times detected)
 
 **Calculation:**
 
-1. Base: €42.00 + €15.00 = €57.00
-2. Payday surcharge: €57.00 × 1.25 = €71.25
-3. Sunday premium: €71.25 + €20.00 = €91.25
-4. Barber (Gerrit): €91.25 × 1.20 = €109.50
-5. Duration fee: (60-30)/15 = 2 × €2.50 = €5.00 → €109.50 + €5.00 = €114.50
-6. Happy hour: €114.50 × 0.85 = €97.33
-7. Beverage: €97.33 + €8.00 = €105.33
-8. VIP multiplier: €105.33 × 1.5 = **€157.99**
+1. Base: €42 + €15 + €18 = €75.00
+2. Service count: 3 services → €75 × 1.10 = €82.50
+3. Combo discounts:
+   - Hair + Beard combo: 10% off cheapest beard (€15) → -€1.50 = €81.00
+   - Package deal (3 services): €81 × 0.85 = €68.85
+4. Payday (15th): €68.85 × 1.25 = €86.06
+5. Sunday: €86.06 + €20 = €106.06
+6. Time (Sunday 15:00 = peak): €106.06 × 1.30 = €137.88
+7. Barber (Gerrit): €137.88 × 1.20 = €165.46
+8. Duration: Required = 35+10+15 = 60 min, actual = 90, extra = 30
+   - Increments: ceil(30/15) = 2 → €5.00
+   - Total: €165.46 + €5 = €170.46
+9. Beverage: €170.46 + €8 = €178.46
+10. Loyalty (Platinum, 12 prev): €178.46 × 0.85 = €151.69
+11. Group (3 people): €151.69 × 0.90 = €136.52
+12. VIP: €136.52 × 1.5 = €204.78
 
-### Example 3: Invalid Booking (Monday)
+**Final Price: €204.78**
 
-- Date: Monday, March 10
-- **Result:** API returns `400 Bad Request` with error message
+---
 
-## Student Tasks
+## Complexity Justification
 
-The student must:
+This specification meets all requirements for non-trivial logic:
 
-1. Implement the price calculation logic in the backend
-2. Add API validation to reject Monday-Thursday appointments
-3. Display the calculated price in the frontend dashboard
-4. (Optional) Show a real-time price estimate in the appointment editor
+✅ **Multi-step calculations**: 12 distinct steps with conditional logic and edge cases
+✅ **Multiple input derivation**: Loyalty tier and group size derived from database queries
+✅ **Complex validation**: Service conflicts, time overlaps, duration requirements, barber availability
+✅ **Processing multiple records**: Querying appointment history, detecting time overlaps
+✅ **Error handling**: Multiple validation failure scenarios with specific error messages and HTTP codes
+
+## Student Deliverables
+
+Students must implement:
+
+1. Service conflict detection algorithm
+2. Time overlap detection for barber conflicts and group bookings
+3. Database queries for loyalty tier calculation
+4. Multi-step price calculation engine following exact order
+5. Comprehensive validation with meaningful error responses
+6. Unit tests covering edge cases and calculation scenarios

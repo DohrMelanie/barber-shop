@@ -53,8 +53,8 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
                 Duration = TimeSpan.FromHours(1)
             };
             
-            appt.Services.Add(new AppointmentService { Name = "Haircut", Price = 30m });
-            appt.Services.Add(new AppointmentService { Name = "Shave", Price = 20m });
+            appt.Services.Add(new AppointmentService { Name = "Haircut", StyleReference = StyleReference.Faded });
+            appt.Services.Add(new AppointmentService { Name = "Shave", StyleReference = StyleReference.HotTowelShave });
 
             context.Appointments.Add(appt);
             await context.SaveChangesAsync();
