@@ -2,66 +2,287 @@
 
 ## Introduction
 
-Welcome to the Barber Shop Management System! You have just started your new job as the lead developer for "Gerrit's Cuts," a trendy barber shop with a twist. The owner, Gerrit, has some... unique ways of doing business, including a non-transparent price calculation logic and a "special" approach to customer data.
+Welcome to the Barber Shop Management System! You have just started your new job as the lead developer for "Gerrit's Cuts," a trendy barber shop with a unique approach to business. Your task is to complete the backend and frontend implementation of an appointment management system with a complex pricing model.
 
-The previous developer left in a hurry, leaving behind a half-finished system. Your mission is to complete the application, fix the messy data import, and build a modern frontend.
+The following simplifications and assumptions apply:
 
-## Important Rules
+- All appointments are walk-in or booked through this system. No external booking systems are considered.
+- The barber shop only operates Friday through Sunday.
+- All services and their base prices are predefined in the system.
+- Currency is Euro (€) and prices are rounded to 2 decimal places.
 
-1.  **Do NOT modification the Starter Code**: You must work within the boundaries of the provided skeleton. You are implementing the missing pieces, not rewriting the architecture.
-2.  **Use Newest Angular Standards**: For the frontend, you must use the latest Angular features, including:
-    - **Standalone Components** (No NgModules)
-    - **Signals** for state management
-    - **Control Flow Syntax** (@if, @for)
+The rules for calculating appointment prices are described in detail in [Price_Calculation.md](./Price_Calculation.md). The pricing model includes multiple surcharges, discounts, and requires database queries to determine loyalty tiers and group bookings.
 
-## Requirements
+## Functional Requirements
 
-### 1. Data Importer (Backend)
+### US1: View Appointment Dashboard
 
-We "acquired" a customer list from a competitor, but the data is a disaster. It's technically XML, but it's broken and invalid.
+As a user, I want to see an overview of all scheduled appointments so that I can manage the barber shop's schedule.
 
-- **Task**: Implement the logic described in `Import_Logic.md`.
-- **Goal**: Create a `LegacyFileFixer` that reads the broken XML stream, repairs it into valid XML, and then uses the existing parser to import `Appointment` records into the database.
-- **Verification**: Ensure all data from `data/BrokenData.xml` (and `data/SampleData.xml`) imports correctly without crashing.
+**Acceptance criteria:**
 
-### 2. Web API Implementation (Backend)
+- The dashboard must display all appointments in a table or list format.
+- Each appointment entry must show:
+  - Date and time
+  - Customer name
+  - Barber name
+  - List of services
+  - **Calculated total price** (computed server-side, not stored)
+- The calculated price must reflect all pricing rules from [Price_Calculation.md](./Price_Calculation.md).
+- There must be a way to navigate to creating a new appointment.
+- There must be a way to delete an appointment.
 
-The Web API shell is there, but the endpoints are effectively empty.
+### US2: Create New Appointment
 
-- **Task**: Complete the implementation of `WebApi/AppointmentEndpoints.cs`.
-- **Endpoints to Implement**:
-  - `GET /appointments`: Retrieve all appointments (including related services).
-  - `GET /appointments/{id}`: Retrieve a specific appointment by ID.
-  - `POST /appointments`: Create a new appointment.
-  - `PUT /appointments/{id}`: Update an existing appointment.
-  - `DELETE /appointments/{id}`: Delete an appointment.
-- **Requirement**: Ensure proper error handling (e.g., returning 404 if an ID isn't found).
+As a user, I want to create a new appointment by filling out a form so that I can schedule customers.
 
-### 3. Price Calculation (Backend)
+**Acceptance criteria:**
 
-- **Task**: Implement the obscure price calculation logic.
-- **Specification**: See [Price_Calculation.md](Price_Calculation.md) for the complete pricing rules and requirements.
-- **Goal**: Ensure that when appointments are retrieved, their total price reflects these complex rules.
-- **Important**: The price must be calculated server-side per appointment, not stored in the database.
+- The form must allow entering:
+  - Customer name (required)
+  - Appointment date (required, must be Friday-Sunday only)
+  - Start time (required)
+  - Duration in minutes (required)
+  - Barber selection (Gerrit or Todd)
+  - One or more services (required)
+  - Beverage choice (optional)
+  - VIP status (checkbox)
+- The form must validate:
+  - Date is Friday, Saturday, or Sunday only
+  - Selected services don't conflict (e.g., CleanShaven + BeardShaped)
+  - Duration meets minimum requirements for selected services
+  - If Gerrit is selected, time must be during peak hours
+  - No time conflict with existing appointments for the selected barber
+- Validation errors must be displayed clearly to the user.
+- (Optional) Show a real-time price estimate as the user selects options.
+- After successful creation, navigate back to the dashboard.
 
-### 4. Frontend (Typescript/Web)
+### US3: Import Legacy Data
 
-The frontend is currently bare-bones. You need to bring it to life!
+As a system administrator, I want to import appointment data from a broken XML file so that historical data can be migrated into the new system.
 
-- **Features**:
-  - **Dashboard**: Display a list of upcoming appointments.
-  - **Editor**: Create a form to add and edit appointments.
-  - **Integration**: Connect your frontend to the backend API you implemented in step 2.
-  - **UX**: Make it look beautiful! Gerrit likes "sharp" designs... but remembers, he is a bit of a scammer.
-  - **Quirks**: Add some "funny" design choices that hint at ripping off customers (e.g., hidden fees text, pre-checked "tip" boxes, etc.).
+**Acceptance criteria:**
+
+- The system must be able to read and fix the broken XML format described in [Import_Logic.md](./Import_Logic.md).
+- Successfully parsed appointments must be inserted into the database.
+- The import process must handle errors gracefully and report which records failed.
+
+## Quality Requirements
+
+### Starter Code
+
+You must use the starter code from the folder [starter](./starter/). The technologies included there must be used:
+
+- **Backend**: ASP.NET Core 9, Entity Framework Core (SQLite), Minimal APIs
+- **Frontend**: Angular 19+, Standalone Components
+- **Testing**: xUnit, NSubstitute
+
+**Important**: You must use the newest Angular standards:
+
+- Standalone components (no NgModules)
+- Signals for state management
+- Control flow syntax (@if, @for)
+
+The following things are already implemented in the starter code:
+
+- **Data model** (`AppServices/Model.cs`):
+  - `Appointment` and `AppointmentService` entities
+  - `StyleReference` enum with 18 service types
+  - `ServiceMetadata` static class with base prices, minimum durations, and helper methods
+  - Entity Framework Core context
+
+- **Database infrastructure**:
+  - SQLite database configuration
+  - Migrations support
+  - Test infrastructure with in-memory database
+
+- **Web API skeleton** (`WebApi/Program.cs`, `AppointmentEndpoints.cs`):
+  - Basic API setup with CORS
+  - Empty endpoint group for appointments
+
+- **Frontend skeleton**:
+  - Routing configuration
+  - Dashboard component with complete HTML/CSS (no TypeScript logic)
+  - Editor component with complete HTML/CSS (no TypeScript logic)
+  - Beautiful, modern styling with vanilla CSS
+
+- **Importer project structure**:
+  - File reader implementation
+  - Project configuration
+
+- **Unit tests**:
+  - Database test infrastructure
+  - Example tests for database access
+
+### Code to be Added
+
+You must implement the following components:
+
+#### Backend: Price Calculation Service
+
+**File**: Create `AppServices/PriceCalculationService.cs`
+
+Implement a service class that calculates appointment prices according to [Price_Calculation.md](./Price_Calculation.md).
+
+**Requirements**:
+
+- Must implement all 12 calculation steps **in the exact order specified**
+- Must implement all 5 validation rules (weekday restriction, service conflicts, duration validation, barber availability, time conflict detection)
+- Must query the database for:
+  - Customer's previous appointments (for loyalty tier calculation)
+  - Existing appointments (for barber conflict detection and group booking detection)
+- Must return appropriate HTTP error codes (400, 409) with meaningful messages for validation failures
+- Must use `ServiceMetadata` methods for base prices and minimum durations
+
+**⚠️ Important**: Ignore any calculation-related comments in the frontend HTML files. Only [Price_Calculation.md](./Price_Calculation.md) is the authoritative specification.
+
+#### Backend: Web API Endpoints
+
+**File**: `WebApi/AppointmentEndpoints.cs`
+
+Implement the following RESTful endpoints:
+
+- `GET /appointments`: Retrieve all appointments with calculated prices
+- `GET /appointments/{id}`: Retrieve a specific appointment by ID (return 404 if not found)
+- `POST /appointments`: Create a new appointment with full validation
+- `PUT /appointments/{id}`: Update an existing appointment (optional)
+- `DELETE /appointments/{id}`: Delete an appointment (return 404 if not found)
+
+**Requirements**:
+
+- All GET requests must include the calculated price for each appointment
+- POST requests must validate using all rules from `PriceCalculationService`
+- Return appropriate HTTP status codes (200, 201, 400, 404, 409)
+- Use async/await properly
+
+#### Backend: Data Importer
+
+**File**: `Importer/LegacyFileFixer.cs` (create new file)
+
+Implement the logic to read and fix broken XML files as described in [Import_Logic.md](./Import_Logic.md).
+
+**Requirements**:
+
+- Read broken XML stream
+- Fix XML structure issues
+- Parse fixed XML into `Appointment` objects
+- Insert appointments into database
+
+#### Frontend: Dashboard Component
+
+**File**: `Frontend/src/app/dashboard/dashboard.ts`
+
+Implement the TypeScript logic for the dashboard component.
+
+**Requirements**:
+
+- Fetch appointments from `GET /appointments` API endpoint
+- Display appointments using the provided HTML template
+- Handle loading and error states
+- Implement delete functionality calling `DELETE /appointments/{id}`
+- Navigate to editor for creating new appointments
+
+#### Frontend: Editor Component
+
+**File**: `Frontend/src/app/editor/editor.ts`
+
+Implement the TypeScript logic for the appointment editor.
+
+**Requirements**:
+
+- Create a reactive form for appointment creation
+- Populate service options dynamically
+- Submit form data to `POST /appointments` API endpoint
+- Handle validation errors from the API and display them to the user
+- (Optional) Calculate and display real-time price estimate
+- Navigate back to dashboard on success
+
+#### Unit Tests: Price Calculation
+
+**File**: `AppServicesTests/PriceCalculationServiceTests.cs` (create new file)
+
+Create comprehensive unit tests for the price calculation logic.
+
+**Requirements**:
+
+- Write at least **3 unit tests** covering:
+  - Base price calculation with multiple services
+  - Service count premium (2 services, 3+ services)
+  - Combo discounts (hair+beard, package deal)
+  - Payday surcharge (15th of month)
+  - Sunday premium
+  - Time-based modifiers (peak hours, happy hours, off-peak)
+  - Barber markup (Gerrit, Todd)
+  - Duration fee calculation
+  - Loyalty tier discount (with mocked database)
+  - Group booking discount (with mocked database)
+  - VIP multiplier
+  - Complete end-to-end calculation matching examples in [Price_Calculation.md](./Price_Calculation.md)
+- Use NSubstitute to mock database dependencies
+- Each test must have clear Arrange/Act/Assert structure
+- Test names must clearly indicate what is being tested
+
+#### Unit Tests: Validation Rules
+
+**File**: `AppServicesTests/AppointmentValidationTests.cs` (create new file)
+
+Create unit tests for validation logic.
+
+**Requirements**:
+
+- Write at least **2 unit tests** covering:
+  - Weekday restriction (Monday-Thursday rejected)
+  - Service conflict detection (CleanShaven+BeardShaped, multiple lengths)
+  - Duration validation (insufficient duration for services)
+  - Barber availability (Gerrit outside peak hours)
+  - Time conflict detection (overlapping appointments)
+- Verify correct HTTP status codes are returned
+- Verify error messages are meaningful
+
+### Testing Requirements
+
+- All tests must be written in **C# using xUnit** (not Angular tests)
+- Tests must use the provided test infrastructure (`TestInfrastructure` project)
+- You must create at least **5 unit tests total** (3 for price calculation, 2 for validation)
+- Tests should cover both happy paths and edge cases
+- Use in-memory database for integration tests where needed
+
+### Prohibited Modifications
+
+**Do NOT modify the starter code** except in the locations specified above. Specifically:
+
+- Do not change `AppServices/Model.cs`
+- Do not change `AppServices/DataContext.cs`
+- Do not change the frontend HTML/CSS files
+- Do not change the project structure or configuration
+
+You are implementing the **missing business logic**, not rewriting the architecture.
 
 ## Getting Started
 
-1.  **Backend**: Open the `FullStackApp.sln` solution.
-    - Run `dotnet run --project AppHost` to start the backend services.
-    - Check the Swagger UI to see the available (but currently unimplemented) endpoints.
-2.  **Frontend**: Navigate to `Frontend/`.
-    - Run `npm install` to get dependencies.
-    - Run `npm start` (or the equivalent script) to launch the development server.
+1. **Open the solution**: Navigate to `starter/` and open `sln.sln`
+2. **Review the specifications**:
+   - Read [Price_Calculation.md](./Price_Calculation.md) carefully
+   - Read [Import_Logic.md](./Import_Logic.md)
+3. **Run the application**:
+   ```bash
+   cd starter
+   dotnet run --project AppHost
+   ```
+4. **Start with tests**: Begin by writing unit tests for the price calculation logic (TDD approach recommended)
+5. **Implement business logic**: Create `PriceCalculationService.cs` with all validation and calculation logic
+6. **Implement API endpoints**: Complete the CRUD operations in `AppointmentEndpoints.cs`
+7. **Implement frontend**: Add TypeScript logic to dashboard and editor components
+8. **Test thoroughly**: Verify all user stories work end-to-end
 
-Good luck! You're going to need it.
+## Evaluation Criteria
+
+Your solution will be evaluated based on:
+
+1. **Correctness of price calculation** (40%): All 12 steps implemented in correct order with proper validation
+2. **Code quality** (25%): Clean architecture, separation of concerns, proper error handling
+3. **Test coverage** (20%): Comprehensive unit tests covering edge cases
+4. **API design** (10%): RESTful endpoints with proper HTTP semantics
+5. **Frontend implementation** (5%): Working Angular application using modern standards
+
+**Note**: The price calculation is the most complex and important part of this exercise. It must be implemented correctly with all steps in the exact order specified.
