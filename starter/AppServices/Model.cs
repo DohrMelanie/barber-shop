@@ -18,17 +18,16 @@ public class Appointment
 
     // TODO for students: Implement calculated price property
     // This should call the PriceCalculationService to compute the price
-    // public decimal CalculatedPrice => ...
 }
 
 public class AppointmentService
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    
+
     // Note: Price is calculated, not stored
     // Use ServiceMetadata.GetBasePrice(StyleReference) to get base price
-    
+
     public StyleReference StyleReference { get; set; }
     public int AppointmentId { get; set; }
 }
@@ -104,29 +103,29 @@ public static class ServiceMetadata
 
     public static bool IsHaircutService(StyleReference style)
     {
-        return style is 
-            StyleReference.Short or 
-            StyleReference.Medium or 
+        return style is
+            StyleReference.Short or
+            StyleReference.Medium or
             StyleReference.Long or
-            StyleReference.Faded or 
-            StyleReference.Tapered or 
+            StyleReference.Faded or
+            StyleReference.Tapered or
             StyleReference.Undercut or
-            StyleReference.Layered or 
+            StyleReference.Layered or
             StyleReference.Textured or
-            StyleReference.SlickedBack or 
+            StyleReference.SlickedBack or
             StyleReference.SideParted or
-            StyleReference.ForwardCrop or 
+            StyleReference.ForwardCrop or
             StyleReference.Voluminous or
-            StyleReference.Natural or 
-            StyleReference.MulletStyle or 
+            StyleReference.Natural or
+            StyleReference.MulletStyle or
             StyleReference.MohawkStyle;
     }
 
     public static bool IsBeardService(StyleReference style)
     {
-        return style is 
-            StyleReference.BeardShaped or 
-            StyleReference.CleanShaven or 
+        return style is
+            StyleReference.BeardShaped or
+            StyleReference.CleanShaven or
             StyleReference.HotTowelShave;
     }
 }

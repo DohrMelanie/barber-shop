@@ -171,14 +171,6 @@ if (extraMinutes > 0) {
 
 Apply the discount to the running total.
 
-**Implementation Note**: Students must query the database:
-
-```sql
-SELECT COUNT(*) FROM Appointments
-WHERE CustomerName = @customerName
-AND Date < @currentAppointmentDate
-```
-
 ### Step 11: Group Booking Discount
 
 **Requires Database Query**: Check if there are other appointments with the same `CustomerName` on the same `Date` where the time ranges overlap (within ±30 minutes):
@@ -328,19 +320,9 @@ AND Date < @currentAppointmentDate
 
 ---
 
-## Complexity Justification
+## Deliverables
 
-This specification meets all requirements for non-trivial logic:
-
-✅ **Multi-step calculations**: 12 distinct steps with conditional logic and edge cases
-✅ **Multiple input derivation**: Loyalty tier and group size derived from database queries
-✅ **Complex validation**: Service conflicts, time overlaps, duration requirements, barber availability
-✅ **Processing multiple records**: Querying appointment history, detecting time overlaps
-✅ **Error handling**: Multiple validation failure scenarios with specific error messages and HTTP codes
-
-## Student Deliverables
-
-Students must implement:
+You must implement:
 
 1. Service conflict detection algorithm
 2. Time overlap detection for barber conflicts and group bookings

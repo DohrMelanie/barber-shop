@@ -145,8 +145,9 @@ Implement the following RESTful endpoints:
 - `GET /appointments`: Retrieve all appointments with calculated prices
 - `GET /appointments/{id}`: Retrieve a specific appointment by ID (return 404 if not found)
 - `POST /appointments`: Create a new appointment with full validation
-- `PUT /appointments/{id}`: Update an existing appointment (optional)
 - `DELETE /appointments/{id}`: Delete an appointment (return 404 if not found)
+
+Beware: an update endpoint is not required.
 
 **Requirements**:
 
@@ -243,9 +244,32 @@ Create unit tests for validation logic.
 
 - All tests must be written in **C# using xUnit** (not Angular tests)
 - Tests must use the provided test infrastructure (`TestInfrastructure` project)
-- You must create at least **5 unit tests total** (3 for price calculation, 2 for validation)
+- You must create at least **3 unit tests** for price calculation and **2 unit tests** for validation rules
 - Tests should cover both happy paths and edge cases
 - Use in-memory database for integration tests where needed
+
+### Example Test Cases for Validation Rules
+
+- Test weekday restriction (Mon-Thu should be rejected with 400)
+- Test service conflict (CleanShaven + BeardShaped should be rejected)
+- Test duration validation (insufficient duration should be rejected)
+- Test barber availability (Gerrit outside peak hours should be rejected)
+- Test time conflict detection (overlapping appointment should return 409)
+
+### Example Test Cases for Price Calculation
+
+- Test base price calculation
+- Test service count premium (2 services = +5%, 3+ services = +10%)
+- Test combo discounts (hair+beard, package deal)
+- Test payday surcharge (15th of month = +25%)
+- Test Sunday premium (+€20)
+- Test time modifiers (peak +30%, happy -15%, off-peak -20%)
+- Test barber markup (Gerrit +20%, Todd -€5)
+- Test duration fee (€2.50 per 15min over required minimum)
+- Test loyalty tier discount (mock DB query, 0-15% based on history)
+- Test group booking discount (mock DB query, 10-20% based on overlaps)
+- Test VIP multiplier (×1.5 final step)
+- Test complete calculation matching Example 4 from Price_Calculation.md
 
 ### Prohibited Modifications
 
@@ -279,10 +303,11 @@ You are implementing the **missing business logic**, not rewriting the architect
 
 Your solution will be evaluated based on:
 
-1. **Correctness of price calculation** (40%): All 12 steps implemented in correct order with proper validation
-2. **Code quality** (25%): Clean architecture, separation of concerns, proper error handling
-3. **Test coverage** (20%): Comprehensive unit tests covering edge cases
-4. **API design** (10%): RESTful endpoints with proper HTTP semantics
-5. **Frontend implementation** (5%): Working Angular application using modern standards
+1. **Correctness of price calculation** (25%): All 12 steps implemented in correct order with proper validation
+2. **Correctness of data import** (15%): All 12 steps implemented in correct order with proper validation
+3. **Code quality** (20%): Clean architecture, separation of concerns, proper error handling
+4. **Test coverage** (20%): Comprehensive unit tests covering edge cases
+5. **API design** (10%): RESTful endpoints with proper HTTP semantics
+6. **Frontend implementation** (10%): Working Angular application using modern standards
 
 **Note**: The price calculation is the most complex and important part of this exercise. It must be implemented correctly with all steps in the exact order specified.

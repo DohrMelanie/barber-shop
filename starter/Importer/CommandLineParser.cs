@@ -1,25 +1,39 @@
 namespace Importer;
 
-/// <summary>
-/// Result of command line parsing
-/// </summary>
-public record CommandLineArgs(string CsvFilePath, bool IsDryRun);
+public class ParseResult
+{
+    public string CsvFilePath { get; set; } = string.Empty;
+    public bool IsDryRun { get; set; }
+}
 
-/// <summary>
-/// Parser for command line arguments
-/// </summary>
 public class CommandLineParser
 {
-    public CommandLineArgs Parse(string[] args)
+    public ParseResult Parse(string[] args)
     {
         if (args.Length == 0)
         {
-            throw new ArgumentException("Please provide a CSV file path as a command line argument.\nUsage: Importer <csv-file-path> [--dry-run]");
+            throw new ArgumentException("Please provide a CSV file path. Usage: Importer <file-path> [--dry-run]");
         }
 
-        var csvFilePath = args[0];
-        var isDryRun = args.Any(arg => arg == "--dry-run");
+        var result = new ParseResult();
 
-        return new CommandLineArgs(csvFilePath, isDryRun);
+        foreach (var arg in args)
+        {
+            if (arg == "--dry-run")
+            {
+                result.IsDryRun = true;
+            }
+            else if (!arg.StartsWith("--") && string.IsNullOrEmpty(result.CsvFilePath))
+            {
+                result.CsvFilePath = arg;
+            }
+        }
+
+        if (string.IsNullOrEmpty(result.CsvFilePath))
+        {
+            throw new ArgumentException("Please provide a CSV file path. Usage: Importer <file-path> [--dry-run]");
+        }
+
+        return result;
     }
 }

@@ -25,17 +25,9 @@ public class LegacyFileFixer(IFileReader fileReader)
     /// <returns>An ImportResult containing successes and failures.</returns>
     public async Task<ImportResult> ImportAsync(string filePath)
     {
-        // 1. Read the raw file content
         var rawContent = await fileReader.ReadAllTextAsync(filePath);
-        
-        // 2. Fix the broken XML
-        // TODO: Implement the logic to repair the XML string.
-        // Guidelines:
-        // - Multiple roots need to be wrapped in a single <Root> element.
-        // - Unescaped '&' characters in attributes need to be fixed.
         var fixedXml = FixXml(rawContent);
 
-        // 3. Parse the fixed XML
         return ParseXml(fixedXml);
     }
 
@@ -43,8 +35,8 @@ public class LegacyFileFixer(IFileReader fileReader)
     {
         // TODO: Your fixing logic goes here.
         // Don't forget to wrap the result in a root element!
-        
-        return brokenXml; // Placeholder
+
+        return brokenXml;
     }
 
     private ImportResult ParseXml(string validXml)
@@ -53,13 +45,10 @@ public class LegacyFileFixer(IFileReader fileReader)
 
         // TODO: Load the validXml into an XDocument or similar parser.
         // var doc = XDocument.Parse(validXml);
-        
+
         // TODO: Iterate through elements and map them to Appointment objects.
-        // Handle the specific business logic requirements:
-        // - Date formats (YYYY-MM-DD vs DD.MM.YYYY)
-        // - Pipe-separated services ("CUT|SHAVE")
-        // - Error handling for missing fields
-        
+        // Handle the specific business logic requirements
+
         return result;
     }
 }

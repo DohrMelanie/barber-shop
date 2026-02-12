@@ -52,7 +52,7 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
                 StartTime = new TimeOnly(10, 0),
                 Duration = TimeSpan.FromHours(1)
             };
-            
+
             appt.Services.Add(new AppointmentService { Name = "Haircut", StyleReference = StyleReference.Faded });
             appt.Services.Add(new AppointmentService { Name = "Shave", StyleReference = StyleReference.HotTowelShave });
 
@@ -71,44 +71,6 @@ public class DatabaseTestsWithClassFixture(DatabaseFixture fixture)
             Assert.NotNull(match);
             Assert.Equal(2, match.Services.Count);
             Assert.Contains(match.Services, s => s.Name == "Haircut");
-        }
-    }
-    [Fact]
-    public async Task CanUpdateAppointment()
-    {
-        // Arrange
-        int appointmentId;
-        await using (var context = new ApplicationDataContext(fixture.Options))
-        {
-            var appt = new Appointment
-            {
-                CustomerName = "Original Name",
-                Date = new DateOnly(2024, 2, 1),
-                StartTime = new TimeOnly(12, 0),
-                Duration = TimeSpan.FromMinutes(45)
-            };
-            context.Appointments.Add(appt);
-            await context.SaveChangesAsync();
-            appointmentId = appt.Id;
-        }
-
-        // Act
-        await using (var context = new ApplicationDataContext(fixture.Options))
-        {
-            var appt = await context.Appointments.FindAsync(appointmentId);
-            Assert.NotNull(appt);
-            appt.CustomerName = "Updated Name";
-            appt.Duration = TimeSpan.FromMinutes(60);
-            await context.SaveChangesAsync();
-        }
-
-        // Assert
-        await using (var context = new ApplicationDataContext(fixture.Options))
-        {
-            var appt = await context.Appointments.FindAsync(appointmentId);
-            Assert.NotNull(appt);
-            Assert.Equal("Updated Name", appt.CustomerName);
-            Assert.Equal(TimeSpan.FromMinutes(60), appt.Duration);
         }
     }
 

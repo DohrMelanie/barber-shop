@@ -18,7 +18,7 @@ Students received a partial ASP.NET Core + Angular application with:
 
 2. **Empty Web API** (`WebApi/AppointmentEndpoints.cs`):
    - Skeleton with endpoint group setup
-   - TODO comments for GET, POST, PUT, DELETE implementations
+   - TODO comments for GET, POST, DELETE implementations
 
 3. **Frontend Skeleton** (Angular):
    - Dashboard HTML with beautiful CSS (no TypeScript logic)
@@ -48,7 +48,6 @@ See `Price_Calculation.md` for complete specification.
 - GET /appointments (retrieve all)
 - GET /appointments/{id} (retrieve by ID)
 - POST /appointments (create with validation)
-- PUT /appointments/{id} (update)
 - DELETE /appointments/{id} (delete)
 
 Must include proper error handling and validation.
@@ -329,19 +328,28 @@ List 3-5 things the student did particularly well.
 
 ## Important Notes for Reviewers
 
-1. **Focus on correctness first**: The 12-step price calculation MUST be correct and in order. This is non-negotiable.
+0. The solution will be evaluated on the following criteria, you must not follow the percentages exactly, but use them as a guide:
 
-2. **Database queries are required**: If loyalty tier or group booking is hardcoded/skipped, this is a critical failure.
+1. **Correctness of price calculation** (25%): All 12 steps implemented in correct order with proper validation
+2. **Correctness of data import** (15%): All 12 steps implemented in correct order with proper validation
+3. **Code quality** (20%): Clean architecture, separation of concerns, proper error handling
+4. **Test coverage** (20%): Comprehensive unit tests covering edge cases
+5. **API design** (10%): RESTful endpoints with proper HTTP semantics
+6. **Frontend implementation** (10%): Working Angular application using modern standards
 
-3. **Be constructive**: Point out what's wrong AND how to fix it. Provide examples.
+7. **Focus on correctness first**: The 12-step price calculation MUST be correct and in order. This is non-negotiable.
 
-4. **Context matters**: Students had starter code with hints. Evaluate based on what they had to implement, not the entire codebase.
+8. **Database queries are required**: If loyalty tier or group booking is hardcoded/skipped, this is a critical failure.
 
-5. **Modern Angular is required**: Using old patterns (NgModules, \*ngIf) when new ones were specified is a problem.
+9. **Be constructive**: Point out what's wrong AND how to fix it. Provide examples.
 
-6. **Testing is important**: Complex logic like price calculation needs tests. Lack of tests for critical paths is a major issue.
+10. **Context matters**: Students had starter code with hints. Evaluate based on what they had to implement, not the entire codebase.
 
-7. **Be fair but rigorous**: This is a complex exercise. Students should demonstrate understanding of multi-step calculations, database queries, and validation logic. Anything less is insufficient.
+11. **Modern Angular is required**: Using old patterns (NgModules, \*ngIf) when new ones were specified is a problem.
+
+12. **Testing is important**: Complex logic like price calculation needs tests. Lack of tests for critical paths is a major issue.
+
+13. **Be fair but rigorous**: This is a complex exercise. Students should demonstrate understanding of multi-step calculations, database queries, and validation logic. Anything less is insufficient.
 
 ---
 

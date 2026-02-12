@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   templateUrl: './editor.html',
 })
 export class Editor {
-  // TODO: Implement logic to create/update appointments
+  // TODO: Implement logic to create appointments
 }
