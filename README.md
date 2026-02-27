@@ -15,7 +15,7 @@ The rules for calculating appointment prices are described in detail in [Price_C
 
 ## Functional Requirements
 
-### US1: View Appointment Dashboard
+### View Appointment Dashboard
 
 As a user, I want to see an overview of all scheduled appointments so that I can manage the barber shop's schedule.
 
@@ -32,7 +32,7 @@ As a user, I want to see an overview of all scheduled appointments so that I can
 - There must be a way to navigate to creating a new appointment.
 - There must be a way to delete an appointment.
 
-### US2: Create New Appointment
+### Create New Appointment
 
 As a user, I want to create a new appointment by filling out a form so that I can schedule customers.
 
@@ -57,7 +57,7 @@ As a user, I want to create a new appointment by filling out a form so that I ca
 - (Optional) Show a real-time price estimate as the user selects options.
 - After successful creation, navigate back to the dashboard.
 
-### US3: Import Legacy Data
+### Import Legacy Data
 
 As a system administrator, I want to import appointment data from a broken XML file so that historical data can be migrated into the new system.
 
@@ -73,7 +73,7 @@ As a system administrator, I want to import appointment data from a broken XML f
 
 You must use the starter code from the folder [starter](./starter/). The technologies included there must be used:
 
-- **Backend**: ASP.NET Core 9, Entity Framework Core (SQLite), Minimal APIs
+- **Backend**: ASP.NET Core 9, Entity Framework Core (SQLite), Minimal API
 - **Frontend**: Angular 19+, Standalone Components
 - **Testing**: xUnit, NSubstitute
 
@@ -104,7 +104,6 @@ The following things are already implemented in the starter code:
   - Routing configuration
   - Dashboard component with complete HTML/CSS (no TypeScript logic)
   - Editor component with complete HTML/CSS (no TypeScript logic)
-  - Beautiful, modern styling with vanilla CSS
 
 - **Importer project structure**:
   - File reader implementation
@@ -195,52 +194,10 @@ Implement the TypeScript logic for the appointment editor.
 - Populate service options dynamically
 - Submit form data to `POST /appointments` API endpoint
 - Handle validation errors from the API and display them to the user
-- (Optional) Calculate and display real-time price estimate
+- Calculate and display real-time price estimate
 - Navigate back to dashboard on success
 
-#### Unit Tests: Price Calculation
-
-**File**: `AppServicesTests/PriceCalculationServiceTests.cs` (create new file)
-
-Create comprehensive unit tests for the price calculation logic.
-
-**Requirements**:
-
-- Write at least **3 unit tests** covering:
-  - Base price calculation with multiple services
-  - Service count premium (2 services, 3+ services)
-  - Combo discounts (hair+beard, package deal)
-  - Payday surcharge (15th of month)
-  - Sunday premium
-  - Time-based modifiers (peak hours, happy hours, off-peak)
-  - Barber markup (Gerrit, Todd)
-  - Duration fee calculation
-  - Loyalty tier discount (with mocked database)
-  - Group booking discount (with mocked database)
-  - VIP multiplier
-  - Complete end-to-end calculation matching examples in [Price_Calculation.md](./Price_Calculation.md)
-- Use NSubstitute to mock database dependencies
-- Each test must have clear Arrange/Act/Assert structure
-- Test names must clearly indicate what is being tested
-
-#### Unit Tests: Validation Rules
-
-**File**: `AppServicesTests/AppointmentValidationTests.cs` (create new file)
-
-Create unit tests for validation logic.
-
-**Requirements**:
-
-- Write at least **2 unit tests** covering:
-  - Weekday restriction (Monday-Thursday rejected)
-  - Service conflict detection (CleanShaven+BeardShaped, multiple lengths)
-  - Duration validation (insufficient duration for services)
-  - Barber availability (Gerrit outside peak hours)
-  - Time conflict detection (overlapping appointments)
-- Verify correct HTTP status codes are returned
-- Verify error messages are meaningful
-
-### Testing Requirements
+### Unit Tests 
 
 - All tests must be written in **C# using xUnit** (not Angular tests)
 - Tests must use the provided test infrastructure (`TestInfrastructure` project)
